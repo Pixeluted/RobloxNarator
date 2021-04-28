@@ -123,6 +123,7 @@ async def set_group_id(ctx,*,ID=None):
                 await send_notify_embed(ctx,'Prompt Cancelled!','This prompt has been cancelled!',True,10)
             else:
                 await send_error(ctx,'Invalid response! Cancelling this prompt!')
+                await notifyEmbed.delete()
 
         except asyncio.TimeoutError:
             await send_error(ctx,'The prompt has timed out!')
