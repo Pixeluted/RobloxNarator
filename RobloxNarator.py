@@ -103,7 +103,7 @@ async def set_group_id(ctx,*,ID=None):
             return msg.author == ctx.message.author and msg.channel == ctx.message.channel
 
         try:
-            response = client.wait_for("message",check=input_check,timeout=60)
+            response = await client.wait_for("message",check=input_check,timeout=60)
 
             if response == "Yes":
                 with open('database.json') as file:
