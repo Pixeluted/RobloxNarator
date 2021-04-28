@@ -104,9 +104,9 @@ async def set_group_id(ctx,*,ID=None):
 
         try:
             response = await client.wait_for("message",check=input_check,timeout=60)
-            print(response,'ok')
+            print(response.content)
 
-            if response == "Yes":
+            if response.content == "Yes":
                 with open('database.json') as file:
                     loadedFile = json.load(file)
                 for checkingGuild in loadedFile["guilds"]:
@@ -119,7 +119,7 @@ async def set_group_id(ctx,*,ID=None):
                     json.dump(loadedFile,f,indent=4)
 
                 await send_notify_embed(ctx,'Success!','Successfully resseted your global group-id!')
-            elif response == "No":
+            elif response.content == "No":
                 await send_notify_embed(ctx,'Prompt Cancelled!','This prompt has been cancelled!',True,10)
             else:
                 await send_error(ctx,'Invalid response! Cancelling this prompt!')
