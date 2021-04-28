@@ -100,7 +100,7 @@ async def set_group_id(ctx,*,ID=None):
         notifyEmbed = await send_notify_embed(ctx,'Confirm Prompt','Do you agree that you want to reset global group-id? Say `Yes` to confirm or `No` to cancel!')
 
         def input_check(msg):
-            return msg.author == ctx.author and msg.channel == ctx.channel
+            return msg.author == ctx.message.author and msg.channel == ctx.message.channel
 
         try:
             response = client.wait_for("message",check=input_check,timeout=60)
