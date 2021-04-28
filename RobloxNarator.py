@@ -1,3 +1,5 @@
+import asyncio
+
 import discord
 from discord.ext import commands,tasks
 import requests
@@ -12,6 +14,7 @@ client.remove_command('help')
 
 # Utility Functions
 
+
 async def send_error(ctx,error):
     embed = discord.Embed(
         title='ERROR',
@@ -19,7 +22,7 @@ async def send_error(ctx,error):
         color=discord.Color.red()
     )
 
-    await ctx.send(embed=embed)
+    await ctx.send(embed=embed,delete_after=10)
 async def send_permission_error(ctx):
     embed = discord.Embed(
         title='ERROR',
@@ -27,7 +30,7 @@ async def send_permission_error(ctx):
         color=discord.Color.red()
     )
 
-    await ctx.send(embed=embed)
+    await ctx.send(embed=embed,delete_after=10)
 async def send_unexpected_error(ctx,error):
     embed = discord.Embed(
         title='UNEXPECTED ERROR',
@@ -35,7 +38,18 @@ async def send_unexpected_error(ctx,error):
         color=discord.Color.red()
     )
 
-    await ctx.send(embed=embed)
+    await ctx.send(embed=embed,delete_after=10)
+async def send_notify_embed(ctx,title,description,delete=None,after=None):
+    embed = discord.Embed(
+        title=title,
+        description=description,
+        color=discord.Colour.blue()
+    )
+
+    if delete == False or delete == None:
+        return await ctx.send(embed=embed)
+    else:
+        return await ctx.send(embed=embed,delete_after=after)
 
 # Bot Commands
 @client.command()
@@ -82,29 +96,37 @@ async def group_info(ctx,*,ID=None):
 @client.command(name='set-group-id')
 @commands.has_permissions(manage_guild=True)
 async def set_group_id(ctx,*,ID=None):
-    if ID == None:
-        await send_error(ctx,'You did not enter group ID!')
+    if ID == None or str(ID).lower() == "none":
+        notifyEmbed = await send_notify_embed(ctx,'Confirm Prompt','Do you agree that you want to reset global group-id? Say `Yes` to confirm or `No` to cancel!')
+
+        def input_check(msg):
+            return msg.author == ctx.author and msg.channel == ctx.channel
+
+        try:
+            response = client.wait_for("message",check=input_check,timeout=60)
+
+            if response == "Yes":
+                with open('database.json') as file:
+                    loadedFile = json.load(file)
+                for checkingGuild in loadedFile["guilds"]:
+                    if int(checkingGuild["guild-id"]) == ctx.guild.id:
+                        guild = checkingGuild
+                        break
+                guild["global-group-id"] = None
+
+                with open('database.json','w') as f:
+                    json.dump(loadedFile,f,indent=4)
+
+                await send_notify_embed(ctx,'Success!','Successfully resseted your global group-id!')
+            elif response == "No":
+                await send_notify_embed(ctx,'Prompt Cancelled!','This prompt has been cancelled!',True,10)
+            else:
+                await send_error(ctx,'Invalid response! Cancelling this prompt!')
+
+        except asyncio.TimeoutError:
+            await send_error(ctx,'The prompt has timed out!')
     else:
-        with open('database.json') as file:
-            loadedFile = json.load(file)
-
-        for checkingGuild in loadedFile["guilds"]:
-            if int(checkingGuild["guild-id"]) == ctx.guild.id:
-                guild = checkingGuild
-                break
-
-        guild["global-group-id"] = int(ID)
-
-        with open('database.json','w') as f:
-            json.dump(loadedFile,f, indent=4)
-
-        embed = discord.Embed(
-            title='Successfully changed!',
-            description=f'Global group id was changed to {ID} for {ctx.guild.name}!',
-            color=discord.Color.green()
-        )
-
-        await ctx.send(embed=embed)
+        print('lk')
 @client.command(name='member-count')
 async def member_count(ctx):
   with open('database.json') as file:
