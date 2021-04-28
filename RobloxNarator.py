@@ -104,6 +104,7 @@ async def set_group_id(ctx,*,ID=None):
 
         try:
             response = await client.wait_for("message",check=input_check,timeout=60)
+            print(response)
 
             if response == "Yes":
                 with open('database.json') as file:
