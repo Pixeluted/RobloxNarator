@@ -46,8 +46,8 @@ async def help(ctx):
         color=discord.Color.blue()
     )
 
-    embed.add_field(name='**Global Use**',value='!group-info {group-id} - This will return information about the specific group! \n \n')
-    embed.add_field(name='**Configuration**',value='!set-group-id {group-id} - This will set your globally choosed group for  this guild! Only admins can use this command!')
+    embed.add_field(name='**Global Use**',value='!group-info {group-id} - This will return information about the specific group! \n \n',inline=False)
+    embed.add_field(name='**Configuration**',value='!set-group-id {group-id} - This will set your globally choosed group for  this guild! Only admins can use this command!',inline=False)
 
     await ctx.send(embed=embed)
 @client.command(name='group-info')
