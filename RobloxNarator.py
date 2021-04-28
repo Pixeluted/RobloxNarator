@@ -50,6 +50,17 @@ async def send_notify_embed(ctx,title,description,delete=None,after=None):
         return await ctx.send(embed=embed)
     else:
         return await ctx.send(embed=embed,delete_after=after)
+def getGroupName(ID):
+    response = json.loads(requests.get(f'https://groups.roblox.com/v1/groups/{ID}').text)
+    return response["name"]
+
+def isThisGroupValid(ID):
+    response = json.loads(requests.get(f'https://groups.roblox.com/v1/groups/{ID}').text)
+
+    if 'errors' in response:
+        return False
+    else:
+        return True
 
 # Bot Commands
 @client.command()
@@ -104,7 +115,6 @@ async def set_group_id(ctx,*,ID=None):
 
         try:
             response = await client.wait_for("message",check=input_check,timeout=60)
-            print(response.content)
 
             if response.content == "Yes":
                 with open('database.json') as file:
@@ -129,7 +139,40 @@ async def set_group_id(ctx,*,ID=None):
         except asyncio.TimeoutError:
             await send_error(ctx,'The prompt has timed out!')
     else:
-        print('lk')
+        if isThisGroupValid(ID):
+            promptEmbed = await send_notify_embed(ctx,'Confirm Prompt',f'Do you want to be {getGroupName(ID)} your global group? Say `Yes` to confirm or `No` to cancel!')
+
+            def input_check(msg):
+                return msg.author == ctx.message.author and msg.channel == ctx.message.channel
+
+            try:
+                response = await client.wait_for("message", check=input_check, timeout=60)
+
+                if response.content == "Yes":
+                    with open('database.json') as file:
+                        loadedFile = json.load(file)
+                    for checkingGuild in loadedFile["guilds"]:
+                        if int(checkingGuild["guild-id"]) == ctx.guild.id:
+                            guild = checkingGuild
+                            break
+                    guild["global-group-id"] = int(ID)
+
+                    with open('database.json', 'w') as f:
+                        json.dump(loadedFile, f, indent=4)
+
+                    await send_notify_embed(ctx, 'Success!', f'Successfully set your global group-id to {ID}!')
+                elif response.content == "No":
+                    await send_notify_embed(ctx, 'Prompt Cancelled!', 'This prompt has been cancelled!', True, 10)
+                else:
+                    await send_error(ctx, 'Invalid response! Cancelling this prompt!')
+                    await asyncio.sleep(10)
+                    await promptEmbed.delete()
+
+            except asyncio.TimeoutError:
+                await send_error(ctx, 'The prompt has timed out!')
+
+        else:
+            await send_error(ctx,"This group isn't valid or doesn't exist!")
 @client.command(name='member-count')
 async def member_count(ctx):
   with open('database.json') as file:
