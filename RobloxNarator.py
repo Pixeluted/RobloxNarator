@@ -46,7 +46,7 @@ async def help(ctx):
         color=discord.Color.blue()
     )
 
-    embed.add_field(name='**Global Use**',value='!group-info {group-id} - This will return information about the specific group! \n \n',inline=False)
+    embed.add_field(name='**Global Use**',value='!group-info {group-id} - This will return information about the specific group! \n \n !member-count - This will get member count of the global group set!',inline=False)
     embed.add_field(name='**Configuration**',value='!set-group-id {group-id} - This will set your globally choosed group for  this guild! Only admins can use this command!',inline=False)
 
     await ctx.send(embed=embed)
@@ -54,7 +54,7 @@ async def help(ctx):
 async def group_info(ctx,*,ID=None):
     print(ID)
     if ID == None:
-        send_error(ctx,'You did not enter group ID!')
+        await send_error(ctx,'You did not enter group ID!')
     else:
         convertedID = int(ID)
 
@@ -105,6 +105,27 @@ async def set_group_id(ctx,*,ID=None):
         )
 
         await ctx.send(embed=embed)
+@client.command(name='member-count')
+async def member_count(ctx):
+  with open('database.json') as file:
+            loadedFile = json.load(file)
+  for checkingGuild in loadedFile["guilds"]:
+            if int(checkingGuild["guild-id"]) == ctx.guild.id:
+                guild = checkingGuild
+                break
+  if guild["global-group-id"] == None:
+    await send_error(ctx,'Please set global group id! !set-group-id {group-id}')
+  else:
+    groupinfo = json.loads(requests.get(f'https://groups.roblox.com/v1/groups/{guild["global-group-id"]}').text)
+
+    embed = discord.Embed(
+      title=f'{groupinfo["name"]} Member Count!',
+      description=f'{groupinfo["name"]} has {groupinfo["memberCount"]} members!',
+      color=discord.Colour.green()
+    )
+
+    await ctx.send(embed=embed)
+
 # Commands Error
 @set_group_id.error
 async def set_group_id_error(ctx,error):
@@ -132,7 +153,7 @@ async def on_guild_join(guild):
     else:
         loadedFile["guilds"].append({
             "guild-id": guild.id,
-            "global-group-id": 0,
+            "global-group-id": None,
             "users": [
 
             ]
@@ -140,5 +161,8 @@ async def on_guild_join(guild):
 
         with open('database.json', 'w') as f:
             json.dump(loadedFile, f, indent=4)
+@client.event
+async def on_ready():
+  print('Bot has started!')
 
 client.run('ODM2ODkwNjU5OTAyMTkzNjk0.YIklKQ.bt-r6mihkz69u9sn9LEafw1RJTE')
