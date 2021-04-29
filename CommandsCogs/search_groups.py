@@ -43,5 +43,7 @@ class search_groups(commands.Cog):
     async def error(self,ctx,error):
         if isinstance(error,requests.HTTPError):
             await send_error(ctx,'There was problem with connecting to the servers! Please try again later!')
+        else:
+            await send_unexpected_error(ctx,error)
 def setup(client):
     client.add_cog(search_groups(client))
