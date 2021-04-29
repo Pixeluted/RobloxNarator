@@ -9,7 +9,7 @@ class member_count(commands.Cog):
     def __init__(self,client):
         self.client = client
 
-    @commands.command(name='member-count')
+    @commands.command()
     async def member_count(self,ctx):
         with open('database.json') as file:
             loadedFile = json.load(file)

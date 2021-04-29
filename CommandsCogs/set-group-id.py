@@ -12,7 +12,7 @@ class set_group_id(commands.Cog):
     def __init__(self,client):
         self.client = client
 
-    @commands.command(name='set-group-id')
+    @commands.command()
     @commands.has_permissions(manage_guild=True)
     async def set_group_id(self,ctx, *, ID=None):
         if ID == None or str(ID).lower() == "none":

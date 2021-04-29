@@ -15,10 +15,10 @@ class help(commands.Cog):
         )
 
         embed.add_field(name='**Global Use**',
-                        value='!group-info {group-id} - This will return information about the specific group! \n \n !member-count - This will get member count of the global group set!',
+                        value='!group_info {group-id} - This will return information about the specific group! \n \n !member_count - This will get member count of the global group set!',
                         inline=False)
         embed.add_field(name='**Configuration**',
-                        value='!set-group-id {group-id} - This will set your globally choosed group for  this guild! Only admins can use this command!',
+                        value='!set_group_id {group-id} - This will set your globally choosed group for  this guild! Only admins can use this command!',
                         inline=False)
 
         await ctx.send(embed=embed)

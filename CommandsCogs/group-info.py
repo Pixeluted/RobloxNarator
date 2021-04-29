@@ -10,7 +10,7 @@ class group_info(commands.Cog):
     def __init__(self,client):
         self.client = client
 
-    @commands.command(name='group-info')
+    @commands.command()
     async def group_info(self,ctx, *, ID=None):
         print(ID)
         if ID == None:
