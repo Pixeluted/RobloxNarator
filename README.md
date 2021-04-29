@@ -1,2 +1,3 @@
 # RobloxNarator
-Discord bot for RoDevs event!
+
+Project Files for Roblox Narator.
