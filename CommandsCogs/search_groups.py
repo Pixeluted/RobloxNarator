@@ -39,5 +39,9 @@ class search_groups(commands.Cog):
                     did += 1
             await asyncio.sleep(1)
             await proccesMessage.edit(embed=responseEmbed)
+    @search_groups.error
+    async def error(self,ctx,error):
+        if isinstance(error,requests.HTTPError):
+            await send_error(ctx,'There was problem with connecting to the servers! Please try again later!')
 def setup(client):
     client.add_cog(search_groups(client))
