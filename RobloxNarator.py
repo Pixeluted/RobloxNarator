@@ -16,4 +16,4 @@ for filename in os.listdir('./CommandsCogs'):
         print(f'Loading {filename}')
         print(f'Successfully loaded {filename}')
 
-client.run('ODM2ODkwNjU5OTAyMTkzNjk0.YIklKQ.bt-r6mihkz69u9sn9LEafw1RJTE')
+client.run('YOUTHINKSO')
